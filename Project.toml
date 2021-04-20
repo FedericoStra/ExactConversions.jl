@@ -1,0 +1,7 @@
+name = "ExactConversions"
+uuid = "9d710cfd-26d5-4b84-a0a4-2b62d6e9d5fb"
+authors = ["Federico Stra <stra.federico@gmail.com> and contributors"]
+version = "0.1.0"
+
+[compat]
+julia = "1.2"
