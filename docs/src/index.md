@@ -4,7 +4,7 @@ CurrentModule = ExactConversions
 
 # ExactConversions
 
-Documentation for [ExactConversions](https://github.com/FedericoStra/ExactConversions.jl).
+Documentation for [ExactConversions.jl](https://github.com/FedericoStra/ExactConversions.jl).
 
 ```@index
 ```
