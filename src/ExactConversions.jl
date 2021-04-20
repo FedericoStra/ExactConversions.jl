@@ -1,6 +1,6 @@
 module ExactConversions
 
-export mincommon, maxcommon
+export mincommon, maxcommon, exactconv
 
 """
     mincommon(I, F) :: I
@@ -55,5 +55,51 @@ function maxcommon(S::Type{<:Signed}, F::Type{<:AbstractFloat})::S
 end
 
 maxcommon(F::Type{<:AbstractFloat}, S::Type{<:Signed})::F = F(maxcommon(S, F))
+
+"""
+    exactconv(I, x::F) :: Union{I,Nothing}
+    exactconv(F, x::I) :: Union{F,Nothing}
+
+Convert between integer and floating-point types. The conversion suceeds only if
+it does not change the numeric value, otherwise it returns `nothing`.
+"""
+function exactconv end
+
+function exactconv(I::Type{<:Union{Signed,Unsigned}}, x::F)::Union{I,Nothing} where F<:AbstractFloat
+    if isinteger(x) && mincommon(F, I) <= x <= maxcommon(F, I)
+        I(x)
+    else
+        nothing
+    end
+end
+
+function exactconv(F::Type{<:AbstractFloat}, x::U)::Union{F,Nothing} where U<:Unsigned
+    bw = 8sizeof(U) - leading_zeros(x) - trailing_zeros(x)
+    if bw <= Base.significand_bits(F)+1 && mincommon(U, F) <= x <= maxcommon(U, F)
+        F(x)
+    else
+        nothing
+    end
+end
+
+function exactconv(F::Type{<:AbstractFloat}, x::S)::Union{F,Nothing} where S<:Signed
+    if x >= S(0)
+        bw = 8sizeof(S) - leading_zeros(x) - trailing_zeros(x)
+        if bw <= Base.significand_bits(F)+1 && mincommon(S, F) <= x <= maxcommon(S, F)
+            F(x)
+        else
+            nothing
+        end
+    elseif x == ~S(0) && x == mincommon(S, F)
+        F(x)
+    else
+        bw = 8sizeof(S) - leading_zeros(-x) - trailing_zeros(-x)
+        if bw <= Base.significand_bits(F)+1 && mincommon(S, F) <= x <= maxcommon(S, F)
+            F(x)
+        else
+            nothing
+        end
+    end
+end
 
 end
